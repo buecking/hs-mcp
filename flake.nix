@@ -38,13 +38,8 @@
             haskellPackages.fourmolu
             # Non-Haskell tools
             nixpkgs-fmt
-          ];
-          # Make external Nix libraries like zlib available to cabal
-          withPackages = ps: with ps; [
             zlib
           ];
-          # Enables Hoogle with all the packages in the environment
-          withHoogle = true;
         };
 
         apps.hs-mcp = flake-utils.lib.mkApp {
