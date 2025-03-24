@@ -37,10 +37,26 @@ createClient config = Client
 -- | Connect to the MCP server via StdIO
 connectClient :: Client -> FilePath -> [String] -> IO Client
 connectClient client@Client{..} cmd args = do
+
+    -- TODO:
+    --
+    --   Create a pipe for interprocess communication and return a (readEnd,
+    --   writeEnd) Handle pair.
+    --
+    --   WinIO Support hen this function is used with WinIO enabled it's
+    --   Wthe caller's responsibility to register the handles with the
+    --   WI/O manager. If this is not done the operation will deadlock.
+    --   WAssociation can be done as follows:
+    --
+    -- https://hackage.haskell.org/package/process-1.6.25.0/docs/System-Process.html#g:8
+
     (Just hstdin, Just hstdout, Nothing, ph) <-
         createProcess (proc cmd args)
             { std_in = CreatePipe
             , std_out = CreatePipe
+            -- was std_err meant to be used for debugging or comms?
+            -- our implementation requires stderr be use
+            , std_err = Inherit
             }
 
     -- Send initialization message

@@ -4,6 +4,7 @@ module AppMain where
 
 import Data.Aeson (Value(..))
 import Network.MCP.Server
+-- import System.IO (hPutStrLn, stderr)
 import Network.MCP.Server.StdIO
 import Network.MCP.Types
 import qualified Data.Map.Strict as Map
@@ -12,7 +13,9 @@ import qualified Data.Text as T
 -- A simple echo server for demonstration purposes
 main :: IO ()
 main = do
-  putStrLn "Starting MCP Echo Server..."
+
+  -- Using stderr for  MCP may be a mistake
+  -- hPutStrLn stderr "Starting MCP Echo Server..."
 
   -- Create server with basic capabilities
   let serverInfo = Implementation
@@ -164,5 +167,5 @@ main = do
         }
 
   -- Start the server with StdIO transport
-  putStrLn "Server initialized, waiting for connections..."
+  -- hPutStrLn stderr "Server initialized, waiting for connections..."
   runServerWithSTDIO server

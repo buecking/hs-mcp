@@ -24,7 +24,7 @@ main = do
 
     -- Create and connect client
     client <- createClient config
-    _ <- connectClient client "path/to/your/mcp/server" []
+    _ <- connectClient client "./dist-newstyle/build/x86_64-linux/ghc-9.6.6/hs-mcp-0.1.0.0/x/mcp-echo-server/build/mcp-echo-server/mcp-echo-server" []
 
     -- List available tools
     tools <- listTools client

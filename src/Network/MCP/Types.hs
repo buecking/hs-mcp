@@ -6,8 +6,8 @@
 
 module Network.MCP.Types
   ( -- * Server Information
-    ServerInfo(..)
-  , ClientInfo(..)
+    ServerInfo
+  , ClientInfo
   , Implementation(..)
     -- * Capabilities
   , ServerCapabilities(..)
@@ -39,8 +39,8 @@ module Network.MCP.Types
     -- * Initialization
   , ServerInitializeOptions(..)
   , ClientInitializeOptions(..)
-  , ServerInitializeResult(..)
-  , ClientInitializeResult(..)
+  , ServerInitializeResult
+  , ClientInitializeResult
     -- * Resource Requests
   , ListResourcesRequest(..)
   , ListResourcesResult(..)

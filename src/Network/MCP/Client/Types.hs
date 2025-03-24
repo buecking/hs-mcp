@@ -1,14 +1,13 @@
 module Network.MCP.Client.Types
     ( Client(..)
     , ClientConfig(..)
---    , ClientError(..)
     , McpClientError(..)
     ) where
 
 import Control.Concurrent.MVar
-import Control.Exception (Exception, throw)
+import Control.Exception (Exception)
 import Data.Aeson (Value)
-import System.IO (Handle,  hFlush, hGetLine)
+import System.IO (Handle)
 import System.Process
 
 import qualified Data.Text as T
@@ -32,17 +31,6 @@ data ClientConfig = ClientConfig
     , clientVersion :: T.Text
     , clientCapabilities :: Value
     }
-
-{-
--- | Custom client errors
-data ClientError
-    = ConnectionError T.Text
-    | ProtocolError T.Text
-    | ServerError T.Text
-    deriving (Show)
-instance Exception ClientError
--}
-
 
 -- | Client state
 data Client = Client
