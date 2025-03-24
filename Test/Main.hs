@@ -9,6 +9,7 @@ import Control.Monad (void)
 import Data.Aeson
 import Data.Text (Text)
 import Network.MCP.Server
+import Network.MCP.Server.Types
 import Network.MCP.Transport.Types
 import Network.MCP.Types
 import System.Exit
@@ -171,7 +172,7 @@ testCallToolRequestResult :: Test
 testCallToolRequestResult = TestCase $ do
   let request = CallToolRequest "test-tool" (Map.singleton "param" (String "value"))
       content = ToolContent
-        { toolContentType = TextContent
+        { toolContentType = TextualContent
         , toolContentText = Just "Test result"
         }
       result = CallToolResult [content] False
@@ -194,19 +195,19 @@ protocolTests = TestList
 
 testServerCreation :: Test
 testServerCreation = TestCase $ do
-  let serverInfo = Implementation "test-server" "1.0.0"
-      serverCapabilities = ServerCapabilities
+  let serverImp = Implementation "test-server" "1.0.0"
+      serverCap = ServerCapabilities
         { resourcesCapability = Just $ ResourcesCapability True
         , toolsCapability = Just $ ToolsCapability True
         , promptsCapability = Just $ PromptsCapability True
         }
 
-  server <- createServer serverInfo serverCapabilities
+  server <- createServer serverImp serverCap
 
   assertEqual "Server name should match" "test-server" (serverName $ serverInfo server)
   assertEqual "Server version should match" "1.0.0" (serverVersion $ serverInfo server)
 
-  caps <- return $ serverCapabilities server
+  let caps = serverCapabilities server
   assertEqual "Resources capability should be enabled"
              (Just $ ResourcesCapability True)
              (resourcesCapability caps)

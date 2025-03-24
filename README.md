@@ -21,6 +21,13 @@ Key features:
 git clone github.com:buecking/hs-mcp.git
 cd hs-mcp
 
+# direnv
+# echo 'use flake' > .envrc
+direnv allow
+
+# nix
+nix develop
+
 # Build the project
 cabal build
 ```
