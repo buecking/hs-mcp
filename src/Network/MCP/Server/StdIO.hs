@@ -6,6 +6,7 @@ module Network.MCP.Server.StdIO
   ) where
 
 import Control.Concurrent
+import Control.Monad
 import Control.Concurrent.STM
 import Data.Aeson
 import Network.MCP.Server
@@ -18,6 +19,7 @@ import qualified Data.Text as T
 -- | Run an MCP server using STDIO transport
 runServerWithSTDIO :: Server -> IO ()
 runServerWithSTDIO server = do
+
   -- Configure stdin/stdout for better performance
   hSetBuffering stdin LineBuffering
   hSetBuffering stdout LineBuffering
@@ -43,7 +45,7 @@ runServerWithSTDIO server = do
         _ -> BLC.hPutStrLn stderr "Received unexpected message type"
 
   -- Create a channel for server-to-transport communication
-  messageQueue <- atomically newTQueue
+  _messageQueue <- newTQueueIO
 
   -- Handle transport closure
   let onClosed = putStrLn "STDIO transport closed"
@@ -58,11 +60,7 @@ runServerWithSTDIO server = do
   runWithSTDIOTransport transport
 
   -- Wait for the server to complete (this won't happen with STDIO until the process is terminated)
-  waitForever
-  where
-    waitForever = do
-      threadDelay 1000000  -- 1 second
-      waitForever
+  forever $ threadDelay 1000000  -- 1 second
 
 -- | Handle a server request
 handleServerRequest :: Server -> Request -> IO ()
@@ -94,6 +92,6 @@ handleServerRequest server request = do
 
 -- | Handle a server notification
 handleServerNotification :: Server -> Notification -> IO ()
-handleServerNotification server notification = do
+handleServerNotification _server _notification = do
   -- TODO: Implement notification handling
   return ()

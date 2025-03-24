@@ -14,19 +14,10 @@ import Control.Exception (SomeException, catch, throwIO)
 import Control.Exception (toException)
 import Control.Monad (forever, void, when)
 import Data.Aeson
-import Data.Aeson.Types
-import Data.Maybe (fromMaybe)
-import Data.Text (Text)
 import Network.MCP.Transport.Types
 import System.IO
-import qualified Data.ByteString as BS
-import qualified Data.ByteString.Lazy as BL
-import qualified Data.Text as T
-import qualified Data.Text.IO as TIO
-import qualified Data.ByteString.Lazy as BS
-
-import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Char8 as BS8
+import qualified Data.ByteString.Lazy as BL
 
 -- | STDIO implementation of the Transport interface
 data STDIOTransport = STDIOTransport
@@ -41,7 +32,11 @@ data STDIOTransport = STDIOTransport
   }
 
 -- | Create a new STDIO transport with the given message handler
-newSTDIOTransport :: (Message -> IO ()) -> IO () -> (SomeException -> IO ()) -> IO STDIOTransport
+newSTDIOTransport
+    :: (Message -> IO ())
+    -> IO ()
+    -> (SomeException -> IO ())
+    -> IO STDIOTransport
 newSTDIOTransport onReceive onClosed onError = do
   -- Configure handles for better performance
   hSetBuffering stdin LineBuffering
@@ -49,8 +44,8 @@ newSTDIOTransport onReceive onClosed onError = do
   hSetEncoding stdin utf8
   hSetEncoding stdout utf8
 
-  queue <- atomically newTQueue
-  closed <- atomically $ newTVar False
+  queue <- newTQueueIO
+  closed <- newTVarIO False
 
   return $ STDIOTransport
     { stdinHandle = stdin
