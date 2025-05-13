@@ -16,6 +16,7 @@ data Server = Server
   , serverResources :: TVar [Resource]                     -- ^ Available resources
   , serverTools :: TVar [Tool]                             -- ^ Available tools
   , serverPrompts :: TVar [Prompt]                         -- ^ Available prompts
+  , serverInstructions :: Text                             -- ^ Instructions
   , serverResourceReadHandler :: TVar (Maybe ResourceReadHandler)  -- ^ Resource read handler
   , serverToolCallHandler :: TVar (Maybe ToolCallHandler)         -- ^ Tool call handler
   , serverPromptHandler :: TVar (Maybe PromptHandler)             -- ^ Prompt handler

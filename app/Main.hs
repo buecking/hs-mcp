@@ -29,7 +29,7 @@ main = do
         }
 
   -- Create server instance
-  server <- createServer serverInfo serverCapabilities
+  server <- createServer serverInfo serverCapabilities "No instructions."
 
   -- Register resources
   let textResource = Resource

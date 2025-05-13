@@ -20,6 +20,8 @@ module Network.MCP.Server
   , handleRequest
   ) where
 
+import System.IO
+import qualified Data.ByteString.Lazy.Char8 as BLC
 import Control.Concurrent (forkIO, threadDelay)
 import Control.Concurrent.STM
 import Control.Exception (catch,toException, SomeException, try)
@@ -33,8 +35,8 @@ import Network.MCP.Types
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 
-createServer :: ServerInfo -> ServerCapabilities -> IO Server
-createServer info caps = do
+createServer :: ServerInfo -> ServerCapabilities -> Text -> IO Server
+createServer info caps instructions = do
   resourcesVar <- newTVarIO []
   toolsVar <- newTVarIO []
   promptsVar <- newTVarIO []
@@ -51,6 +53,7 @@ createServer info caps = do
         , serverResources = resourcesVar
         , serverTools = toolsVar
         , serverPrompts = promptsVar
+        , serverInstructions = instructions
         , serverResourceReadHandler = resourceHandlerVar
         , serverToolCallHandler = toolHandlerVar
         , serverPromptHandler = promptHandlerVar
@@ -146,7 +149,7 @@ handleRequest server request = do
           { responseJsonrpc = JSONRPC "2.0"
           , responseId = requestId request
           , responseResult = case value of
-              Left _err -> Nothing -- WAT?
+              Left _err -> error (show _err) -- WAT?
               Right v -> Just v
           , responseError = Nothing
           }
@@ -189,6 +192,7 @@ registerInitializeHandler server = registerRequestHandler server "initialize" $ 
             { serverInitProtocolVersion = head supportedVersions
             , serverInitInfo = serverInfo server
             , serverInitCapabilities = serverCapabilities server
+            , serverInitInstructions = serverInstructions server
             }
 
       return $ Right $ toJSON serverOptions
