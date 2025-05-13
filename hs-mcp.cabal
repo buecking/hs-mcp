@@ -11,8 +11,7 @@ author:             Bryan Buecking
 maintainer:         "drop 8 $ reverse<moc.liamg@gnikceub+maps_on>"
 copyright:          Public Domain
 category:           AI
-extra-source-files: CHANGELOG.md
-                    README.md
+extra-source-files: README.md
 
 library
   exposed-modules:    Network.MCP.Types
