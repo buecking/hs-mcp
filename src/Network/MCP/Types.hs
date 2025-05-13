@@ -34,7 +34,7 @@ module Network.MCP.Types
     -- * Roots
   , Root(..)
     -- * Protocol Versions
-  , ProtocolVersion(..)
+  , ProtocolVersion
   , supportedVersions
     -- * Initialization
   , ServerInitializeOptions(..)
@@ -77,27 +77,12 @@ import GHC.Generics
 import qualified Data.Map.Strict as Map
 
 -- | Protocol version
-data ProtocolVersion = ProtocolVersion
-  { protocolVersionMajor :: Int
-  , protocolVersionMinor :: Int
-  } deriving (Show, Eq, Generic)
-
-instance ToJSON ProtocolVersion where
-  toJSON ProtocolVersion{..} = object
-    [ "major" .= protocolVersionMajor
-    , "minor" .= protocolVersionMinor
-    ]
-
-instance FromJSON ProtocolVersion where
-  parseJSON = withObject "ProtocolVersion" $ \o -> do
-    major <- o .: "major"
-    minor <- o .: "minor"
-    return $ ProtocolVersion major minor
+type ProtocolVersion = Text
 
 -- | Supported protocol versions
 supportedVersions :: [ProtocolVersion]
 supportedVersions =
-  [ ProtocolVersion 0 1  -- Current version is 0.1
+  [ "2024-11-05"
   ]
 
 -- | Implementation information
@@ -287,7 +272,7 @@ instance FromJSON ResourceContent where
 data Tool = Tool
   { toolName :: Text                -- ^ Name of the tool
   , toolDescription :: Maybe Text   -- ^ Optional description
-  , toolInputSchema :: Text         -- ^ JSON schema for tool parameters
+  , toolInputSchema :: Value        -- ^ JSON schema for tool parameters
   } deriving (Show, Eq, Generic)
 
 instance ToJSON Tool where
@@ -454,21 +439,24 @@ data ServerInitializeOptions = ServerInitializeOptions
   { serverInitProtocolVersion :: ProtocolVersion  -- ^ Protocol version
   , serverInitInfo :: Implementation              -- ^ Server info
   , serverInitCapabilities :: ServerCapabilities  -- ^ Server capabilities
+  , serverInitInstructions :: Text
   } deriving (Show, Eq, Generic)
 
 instance ToJSON ServerInitializeOptions where
   toJSON ServerInitializeOptions{..} = object
     [ "protocolVersion" .= serverInitProtocolVersion
-    , "implementation" .= serverInitInfo
+    , "serverInfo" .= serverInitInfo
     , "capabilities" .= serverInitCapabilities
+    , "instructions" .= serverInitInstructions
     ]
 
 instance FromJSON ServerInitializeOptions where
   parseJSON = withObject "ServerInitializeOptions" $ \o -> do
     version <- o .: "protocolVersion"
-    impl <- o .: "implementation"
+    impl <- o .: "serverInfo"
     capabilities <- o .: "capabilities"
-    return $ ServerInitializeOptions version impl capabilities
+    instructions <- o .: "instructions"
+    return $ ServerInitializeOptions version impl capabilities instructions
 
 -- | Client initialize options
 data ClientInitializeOptions = ClientInitializeOptions
@@ -480,14 +468,14 @@ data ClientInitializeOptions = ClientInitializeOptions
 instance ToJSON ClientInitializeOptions where
   toJSON ClientInitializeOptions{..} = object
     [ "protocolVersion" .= clientInitProtocolVersion
-    , "implementation" .= clientInitInfo
+    , "clientInfo" .= clientInitInfo
     , "capabilities" .= clientInitCapabilities
     ]
 
 instance FromJSON ClientInitializeOptions where
   parseJSON = withObject "ClientInitializeOptions" $ \o -> do
     version <- o .: "protocolVersion"
-    impl <- o .: "implementation"
+    impl <- o .: "clientInfo"
     capabilities <- o .: "capabilities"
     return $ ClientInitializeOptions version impl capabilities
 
