@@ -25,6 +25,7 @@ import Network.MCP.Client.Types
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import qualified Data.ByteString.Lazy.Char8 as BLC
+import qualified Data.ByteString.Char8 as C8
 
 -- | Create a new client
 createClient :: ClientConfig -> IO Client
@@ -60,11 +61,14 @@ connectClient client@Client{..} cmd args = do
             }
 
     -- Send initialization message
+    let protoVersion = case clientConfig of
+          ClientConfig _ _ _ pv -> pv
     let initMessage = object
             [ "jsonrpc" .= ("2.0" :: T.Text)
             , "method" .= ("initialize" :: T.Text)
             , "params" .= object
-                [ "clientInfo" .= object
+                [ "protocolVersion" .= protoVersion
+                , "clientInfo" .= object
                     [ "name" .= clientName clientConfig
                     , "version" .= clientVersion clientConfig
                     ]
@@ -76,6 +80,9 @@ connectClient client@Client{..} cmd args = do
     -- Write initialization message
     BLC.hPutStrLn hstdin (encode initMessage)
     hFlush hstdin
+
+    -- Read and consume initialize response to avoid mixing with subsequent requests
+    _ <- C8.hGetLine hstdout
 
     void $ swapMVar clientProcess (Just ph)
     void $ swapMVar clientStdin (Just hstdin)
