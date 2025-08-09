@@ -45,9 +45,9 @@ sendClientRequest client message = do
         Nothing -> throw $ ConnectionError "Stdout not available"
 
     -- Encode and send message
-    let a = BL.toStrict $ encode message
-    C8.hPut hstdin a
-
+    let reqBs = BL.toStrict $ encode message
+    C8.hPut hstdin reqBs
+    C8.hPutStrLn hstdin (C8.pack "")
     hFlush hstdin
 
     -- Read and parse response
